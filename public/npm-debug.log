@@ -1,0 +1,20 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/home/action/.parts/bin/node',
+1 verbose cli   '/home/action/.parts/bin/npm',
+1 verbose cli   'start' ]
+2 info using npm@1.4.3
+3 info using node@v0.10.26
+4 verbose node symlink /home/action/.parts/bin/node
+5 error Error: ENOENT, open '/home/action/bloc-jams/public/package.json'
+6 error If you need help, you may report this *entire* log,
+6 error including the npm and node versions, at:
+6 error     <http://github.com/npm/npm/issues>
+7 error System Linux 3.13.4
+8 error command "/home/action/.parts/bin/node" "/home/action/.parts/bin/npm" "start"
+9 error cwd /home/action/bloc-jams/public
+10 error node -v v0.10.26
+11 error npm -v 1.4.3
+12 error path /home/action/bloc-jams/public/package.json
+13 error code ENOENT
+14 error errno 34
+15 verbose exit [ 34, true ]
