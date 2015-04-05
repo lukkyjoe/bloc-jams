@@ -1,4 +1,4 @@
-$(document).ready(function(){
+jQuery(window.document).ready(function(){
     $('.hero-content h3').click(function(){
       var subText = $(this).text();
       $(this).text(subText + "!");

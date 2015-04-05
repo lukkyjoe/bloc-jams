@@ -16,7 +16,7 @@ var buildAlbumThumbnail = function(){
       + '  </div>'
       + '</div>';
   
-    return $(template);
+    return jQuery(template);
 };
 
 var updateCollectionView = function(){
@@ -24,7 +24,7 @@ var updateCollectionView = function(){
   $collection.empty();
   
   for (var i = 0; i < Math.floor((Math.random() * 50) + 1); i++){
-    var $newThumnail = buildAlbumThumbnail();
+    var $newThumbnail = buildAlbumThumbnail();
     $collection.append(buildAlbumThumbnail());
   }
 };
