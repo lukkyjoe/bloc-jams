@@ -39,23 +39,23 @@ var buildAlbumOverlay = function(albumURL) {
 };
 
 var updateCollectionView = function(){
-  var $collection = $(".collection-container .row");
-  $collection.empty();
+  var collection = $(".collection-container .row");
+  collection.empty();
   
   for (var i = 0; i < 33; i++){
-    var $newThumbnail = buildAlbumThumbnail();
-    $collection.append(buildAlbumThumbnail());
+    var newThumbnail = buildAlbumThumbnail();
+    collection.append(buildAlbumThumbnail());
   }
 
-    var onHover = function(event){
+    var onHover = function(){
       $(this).append(buildAlbumOverlay("/album.html"));
     };
 
-  var offHover = function(event) {
+  var offHover = function() {
     $(this).find('.collection-album-image-overlay').remove();
   };
 
-  $collection.find('.collection-album-image-container').hover(onHover, offHover);
+   collection.find('.collection-album-image-container').hover(onHover, offHover);
 };
 
 if (document.URL.match(/\/collection.html/)){
