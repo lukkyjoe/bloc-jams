@@ -1,5 +1,5 @@
 // holds the name of our tab button container for selection later in the function
-var tabsContainer = ".user-profile-tabs-container"
+var tabsContainer = ".user-profile-tabs-container";
 var selectTabHandler = function(event){
   $tab = $(this);
   $(tabsContainer + " li").removeClass('active');
@@ -11,11 +11,10 @@ var selectTabHandler = function(event){
   event.preventDefault();
 };
 
-if (document.URL.match(/\/profile.html)){
+if (document.URL.match(/\/profile.html/)){
   $(document).ready(function(){
-  var $tabs = $(tabsContainer + " a");
-  $tabs.click(selectTabHandler);
-  $tabs[0].click();
-});
-})
-  }
+    var $tabs = $(tabsContainer + " a");
+    $tabs.click(selectTabHandler);
+    $tabs[0].click();
+  });
+}
