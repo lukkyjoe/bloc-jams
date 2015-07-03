@@ -1817,6 +1817,9 @@ if (typeof JSON !== 'object') {
     return url + (url.indexOf('?') >= 0 ? '&' : '?') +'cacheBuster=' + date;
   };
 
+  var browser = navigator.userAgent.toLowerCase();
+  var forceRepaint = ar.forceRepaint || browser.indexOf('chrome') > -1;
+
   var reloaders = {
     page: function(){
       window.location.reload(true);
@@ -1824,24 +1827,17 @@ if (typeof JSON !== 'object') {
 
     stylesheet: function(){
       [].slice
-        .call(document.querySelectorAll('link[rel="stylesheet"]'))
-        .filter(function(link){
-          return (link != null && link.href != null);
-        })
+        .call(document.querySelectorAll('link[rel="stylesheet"][href]:not([data-autoreload="false"]'))
         .forEach(function(link) {
           link.href = cacheBuster(link.href);
         });
 
-      // hack to force page repaint
-      var el = document.body;
-      var bodyDisplay = el.style.display || 'block';
-      el.style.display = 'none';
-      el.offsetHeight;
-      el.style.display = bodyDisplay;
+      // Hack to force page repaint after 25ms.
+      if (forceRepaint) setTimeout(function() { document.body.offsetHeight; }, 25);
     }
   };
   var port = ar.port || 9485;
-  var host = br.server || window.location.hostname;
+  var host = br.server || window.location.hostname || 'localhost';
 
   var connect = function(){
     var connection = new WebSocket('ws://' + host + ':' + port);
