@@ -3,6 +3,7 @@
 //require('./album');
 //require("./profile");
 
+
 var albumPicasso = {
   name: 'The Colors',
   artist: 'Pablo Picasso',
@@ -61,11 +62,14 @@ var blocJams = angular.module('BlocJams', ['ui.router']);
    ];
  }]);
 
- blocJams.controller('Collection.controller',['$scope',function($scope){
+blocJams.controller('Collection.controller', ['$scope','SongPlayer', function($scope, SongPlayer) {
    $scope.albums = [];
      for (var i = 0; i < 33; i++){
        $scope.albums.push(angular.copy(albumPicasso));
      }
+   $scope.playAlbum = function(album){
+     SongPlayer.setSong(album, album.songs[0]); // Targets first song in the array.
+   }  
  }]);
 blocJams.controller('Album.controller', ['$scope', 'SongPlayer', function($scope, SongPlayer) {
    $scope.album = angular.copy(albumPicasso);
@@ -144,7 +148,7 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', function($s
        this.currentSong = this.currentAlbum.songs[currentTrackIndex];
      },     
      setSong: function(album, song) {
-       if (currentSongFile){
+       if (currentSoundFile){
          currentSoundFile.stop();
        }
        this.currentAlbum = album;
@@ -158,6 +162,51 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', function($s
      }
    };
  });
+blocJams.directive('slider',function(){
+   var updateSeekPercentage = function($seekBar, event) {
+     var barWidth = $seekBar.width();
+     var offsetX =  event.pageX - $seekBar.offset().left;
+ 
+     var offsetXPercent = (offsetX  / $seekBar.width()) * 100;
+     offsetXPercent = Math.max(0, offsetXPercent);
+     offsetXPercent = Math.min(100, offsetXPercent);
+ 
+     var percentageString = offsetXPercent + '%';
+     $seekBar.find('.fill').width(percentageString);
+     $seekBar.find('.thumb').css({left: percentageString});
+   }
+   
+  
+  return{
+    templateUrl: '/templates/directives/slider.html', // We'll create these files shortly.
+    replace: true,
+    restrict: 'E',
+    link: function(scope, element, attributes) {
+ 
+      var $seekBar = $(element);
+ 
+      $seekBar.click(function(event) {
+        updateSeekPercentage($seekBar, event);
+      });
+ 
+      $seekBar.find('.thumb').mousedown(function(event){
+        $seekBar.addClass('no-animate');
+ 
+        $(document).bind('mousemove.thumb', function(event){
+          updateSeekPercentage($seekBar, event);
+        });
+ 
+        //cleanup
+        $(document).bind('mouseup.thumb', function(){
+          $seekBar.removeClass('no-animate');
+          $(document).unbind('mousemove.thumb');
+          $(document).unbind('mouseup.thumb');
+        });
+ 
+      });
+    }
+  };
+});
 // angular.module('BlocJams', []).controller('Landing.controller', ['$scope', function($scope) {
 //   $scope.subText = "yooo!";
 //  }]);
