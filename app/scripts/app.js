@@ -20,10 +20,10 @@ var albumPicasso = {
  };
 
 var blocJams = angular.module('BlocJams', ['ui.router']);
- 
+
  blocJams.config(['$stateProvider', '$locationProvider', function($stateProvider, $locationProvider) {
    $locationProvider.html5Mode(true);
- 
+
    $stateProvider.state('collection',{
      url:'/collection',
      controller: 'Collection.controller',
@@ -40,15 +40,15 @@ var blocJams = angular.module('BlocJams', ['ui.router']);
      templateUrl: '/templates/landing.html'
    });
  }]);
- 
+
 //  // This is a cleaner way to call the controller than crowding it on the module definition.
  blocJams.controller('Landing.controller', ['$scope', function($scope) {
-   $scope.subText = "Turn the music up!";   
+   $scope.subText = "Turn the music up!";
 
    $scope.subTextClicked = function() {
      $scope.subText += '!';
    };
-  
+
      $scope.albumURLs = [
      '/images/album-placeholders/album-1.jpg',
      '/images/album-placeholders/album-2.jpg',
@@ -69,21 +69,21 @@ blocJams.controller('Collection.controller', ['$scope','SongPlayer', function($s
      }
    $scope.playAlbum = function(album){
      SongPlayer.setSong(album, album.songs[0]); // Targets first song in the array.
-   }  
+   }
  }]);
 blocJams.controller('Album.controller', ['$scope', 'SongPlayer', function($scope, SongPlayer) {
    $scope.album = angular.copy(albumPicasso);
-   
+
       var hoveredSong = null;
- 
+
    $scope.onHoverSong = function(song) {
      hoveredSong = song;
    };
- 
+
    $scope.offHoverSong = function(song) {
      hoveredSong = null;
    };
-   
+
       $scope.getSongState = function(song) {
      if (song === SongPlayer.currentSong && SongPlayer.playing) {
        return 'playing';
@@ -93,11 +93,11 @@ blocJams.controller('Album.controller', ['$scope', 'SongPlayer', function($scope
      }
      return 'default';
    };
-   
+
        $scope.playSong = function(song) {
          SongPlayer.setSong($scope.album, song);
     };
- 
+
     $scope.pauseSong = function(song) {
       SongPlayer.pause();
     };
@@ -106,19 +106,19 @@ blocJams.controller('Album.controller', ['$scope', 'SongPlayer', function($scope
 blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', function($scope, SongPlayer) {
    $scope.songPlayer = SongPlayer;
  }]);
- 
+
  blocJams.service('SongPlayer', function() {
    var currentSoundFile = null;
    var trackIndex = function(album, song) {
      return album.songs.indexOf(song);
    };
-    
-   
+
+
    return {
      currentSong: null,
      currentAlbum: null,
      playing: false,
- 
+
      play: function() {
        this.playing = true;
        currentSoundFile.play();
@@ -146,7 +146,7 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', function($s
        var song = this.currentAlbum.songs[currentTrackIndex];
       this.setSong(this.currentAlbum, song);
        this.currentSong = this.currentAlbum.songs[currentTrackIndex];
-     },     
+     },
      setSong: function(album, song) {
        if (currentSoundFile){
          currentSoundFile.stop();
@@ -157,56 +157,64 @@ blocJams.controller('PlayerBar.controller', ['$scope', 'SongPlayer', function($s
        formats: [ "mp3" ],
        preload: true
     });
- 
+
        this.play();
      }
    };
  });
-blocJams.directive('slider',function(){
-   var updateSeekPercentage = function($seekBar, event) {
-     var barWidth = $seekBar.width();
-     var offsetX =  event.pageX - $seekBar.offset().left;
- 
-     var offsetXPercent = (offsetX  / $seekBar.width()) * 100;
+blocJams.directive('slider', ['$document', function($document){
+  var calculateSliderPercentFromMouseEvent = function($slider, event) {
+     var offsetX =  event.pageX - $slider.offset().left; // Distance from left
+     var sliderWidth = $slider.width(); // Width of slider
+     var offsetXPercent = (offsetX  / sliderWidth);
      offsetXPercent = Math.max(0, offsetXPercent);
-     offsetXPercent = Math.min(100, offsetXPercent);
- 
-     var percentageString = offsetXPercent + '%';
-     $seekBar.find('.fill').width(percentageString);
-     $seekBar.find('.thumb').css({left: percentageString});
-   }
-   
-  
-  return{
+     offsetXPercent = Math.min(1, offsetXPercent);
+     return offsetXPercent;
+   };
+   return{
     templateUrl: '/templates/directives/slider.html', // We'll create these files shortly.
     replace: true,
     restrict: 'E',
+    scope: {},
     link: function(scope, element, attributes) {
- 
+      scope.value = 0;
+      scope.max = 200;
       var $seekBar = $(element);
- 
-      $seekBar.click(function(event) {
-        updateSeekPercentage($seekBar, event);
-      });
- 
-      $seekBar.find('.thumb').mousedown(function(event){
-        $seekBar.addClass('no-animate');
- 
-        $(document).bind('mousemove.thumb', function(event){
-          updateSeekPercentage($seekBar, event);
-        });
- 
-        //cleanup
-        $(document).bind('mouseup.thumb', function(){
-          $seekBar.removeClass('no-animate');
-          $(document).unbind('mousemove.thumb');
-          $(document).unbind('mouseup.thumb');
-        });
- 
-      });
+      var percentString = function () {
+      var percent = Number(scope.value) / Number(scope.max) * 100;
+        return percent + "%";
+      };
+
+      scope.fillStyle = function() {
+        return {width: percentString()};
+      };
+
+      scope.thumbStyle = function() {
+        return {left: percentString()};
+      };
+
+      scope.onClickSlider = function(event) {
+        var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+        scope.value = percent * scope.max;
+      };
+
+      scope.trackThumb = function() {
+         $document.bind('mousemove.thumb', function(event){
+           var percent = calculateSliderPercentFromMouseEvent($seekBar, event);
+           scope.$apply(function(){
+             scope.value = percent * scope.max;
+           });
+         });
+
+         //cleanup
+         $document.bind('mouseup.thumb', function(){
+           $document.unbind('mousemove.thumb');
+           $document.unbind('mouseup.thumb');
+         });
+       };
     }
   };
-});
+}]);
 // angular.module('BlocJams', []).controller('Landing.controller', ['$scope', function($scope) {
 //   $scope.subText = "yooo!";
 //  }]);
