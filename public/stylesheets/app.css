@@ -219,7 +219,7 @@ td.song-number {
     border-radius: 50%;
     cursor: pointer;
     transition: all 100ms ease-in-out; }
-  .slider.active .fill, .slider.active .thumb {
+  .slider:active .fill, .slider:active .thumb {
     transition: none; }
   .slider:hover .thumb, .slider:active .thumb {
     width: 20px;
